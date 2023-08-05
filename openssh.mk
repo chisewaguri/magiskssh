@@ -1,5 +1,5 @@
 $(eval $(call start_package))
-OPENSSH?=openssh-9.3p1
+OPENSSH?=openssh-9.3p2# Updated from 9.3p1 to adress CVE-2023-38408
 
 PACKAGE=openssh
 
