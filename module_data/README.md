@@ -53,10 +53,10 @@ Feel free to create a Merge Request against the [source repository](https://gitl
 
 ## Changelog
 
-###### 2023-07029, v0.16
+###### 2023-08-05, v0.16
 
+- Version bump. (thanks HiWhatName)
 - Adress CVE-2023-38408, even though we don't ship the affected agent.
-- Version bump.
 - OpenSSH 9.3p2
 
 ###### 2023-03-26, v0.15
