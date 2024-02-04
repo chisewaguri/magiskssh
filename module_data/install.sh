@@ -180,12 +180,14 @@ set_permissions() {
   set_perm_recursive "$MODPATH/system/usr/libexec/ssh-core" 0 0 0755 0755
   set_perm "$MODPATH/opensshd.init" 0 0 0755
   set_perm /data/ssh/sshd_config 0 0 0600
+  chcon -h u:object_r:system_file:s0 "$MODPATH/system/bin/"*
+  chown -h root:shell "$MODPATH/system/bin/"*
   chown shell:shell /data/ssh/shell
   chown shell:shell /data/ssh/shell/.ssh
   chown root:root /data/ssh/root
   chown root:root /data/ssh/root/.ssh
-  chmod 700 /data/ssh/{shell,root}
-  chmod 700 /data/ssh/{shell,root}/.ssh
+  chmod 700 /data/ssh/shell /data/ssh/root
+  chmod 700 /data/ssh/shell/.ssh /data/ssh/root/.ssh
 }
 
 # You can add more functions to assist your custom script code
