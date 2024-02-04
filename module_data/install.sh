@@ -22,7 +22,7 @@
 # Set to true if you do *NOT* want Magisk to mount
 # any files for you. Most modules would NOT want
 # to set this flag to true
-SKIPMOUNT=true
+SKIPMOUNT=false
 
 # Set to true if you need to load system.prop
 PROPFILE=false
@@ -133,23 +133,23 @@ on_install() {
   local TMPDIR="$MODPATH/tmp"
   ui_print "[0/7] Preparing module directory"
   mkdir -p "$TMPDIR"
-  mkdir -p "$MODPATH/usr/bin/raw"
+  mkdir -p "$MODPATH/system/bin"
+  mkdir -p "$MODPATH/system/usr/libexec/ssh-core"
 
   ui_print "[1/7] Extracting architecture unspecific module files"
   unzip -o "$ZIPFILE" 'common/opensshd.init' -d "$MODPATH/tmp" >&2
-  unzip -o "$ZIPFILE" 'common/magisk_ssh_library_wrapper' -d "$MODPATH/tmp" >&2
+  unzip -o "$ZIPFILE" 'common/wrapper' -d "$MODPATH/tmp" >&2
   mv "$TMPDIR/common/opensshd.init" "$MODPATH"
-  mv "$TMPDIR/common/magisk_ssh_library_wrapper" "$MODPATH/usr/bin/raw"
+  mv "$TMPDIR/common/wrapper" "$MODPATH/system/usr/libexec/ssh-core"
 
   ui_print "[2/7] Extracting libraries and binaries for $ARCH"
   unzip -o "$ZIPFILE" "arch/$ARCH/*" -d "$TMPDIR" >&2
-  mv "$TMPDIR/arch/$ARCH/lib" "$MODPATH/usr"
-  mv "$TMPDIR/arch/$ARCH/bin"/* "$MODPATH/usr/bin"
+  mv "$TMPDIR/arch/$ARCH/lib" "$MODPATH/system/usr"
+  mv "$TMPDIR/arch/$ARCH/bin"/* "$MODPATH/system/usr/libexec/ssh-core"
 
   ui_print "[3/7] Configuring library path wrapper"
   for f in scp sftp sftp-server ssh ssh-keygen sshd rsync; do
-    mv "$MODPATH/usr/bin/$f" "$MODPATH/usr/bin/raw/$f"
-    ln -s ./raw/magisk_ssh_library_wrapper "$MODPATH/usr/bin/$f"
+    ln -s /system/usr/libexec/ssh-core/wrapper "$MODPATH/system/bin/$f"
   done
 
   ui_print "[4/6] Creating SSH user directories"
@@ -177,7 +177,7 @@ set_permissions() {
   # The following is the default rule, DO NOT remove
   set_perm_recursive $MODPATH 0 0 0755 0644
 
-  set_perm_recursive "$MODPATH/usr/bin" 0 0 0755 0755
+  set_perm_recursive "$MODPATH/system/usr/libexec/ssh-core" 0 0 0755 0755
   set_perm "$MODPATH/opensshd.init" 0 0 0755
   set_perm /data/ssh/sshd_config 0 0 0600
   chown shell:shell /data/ssh/shell
