@@ -1,8 +1,0 @@
-#!/system/bin/sh
-
-bindir="$(dirname "$0")"
-execname="$(basename "$0")"
-
-libdir="$(realpath "$bindir/../lib")"
-
-exec env LD_LIBRARY_PATH="$libdir" "$bindir/raw/$execname" "$@"

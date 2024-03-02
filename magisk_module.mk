@@ -32,7 +32,7 @@ $(BUILD_DIR)/module/stamp.module-initscript: $(BUILD_DIR)/arm/openssh/stamp.buil
 	    -e 's#=/bin#=/system/bin#'                 \
 	    -e 's#.*PidFile.*##'                       \
 	    -e 's#sbin#bin#'                           \
-	    -e 's#^prefix=.*#: $${MODDIR:="$$(realpath "$$(dirname "$$0")")"}\nexport MODDIR\nprefix=\"$$MODDIR/usr\"#' \
+	    -e 's#^prefix=.*#prefix=/system#' \
 	    -e 's#@COMMENT_OUT_RSA1@.*##'              \
 	    $(BUILD_DIR)/arm/openssh/opensshd.init     \
 	    > $(BUILD_DIR)/module/magisk_ssh/common/opensshd.init
