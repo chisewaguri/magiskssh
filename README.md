@@ -87,6 +87,9 @@ To generate one for a new version do this:
 - The module_data/README.md is updated to include the new package versions
 - An entry in the changelog in module_data/README.md is added
 
+Then we can create a full build (delete _build_ directory first), upload it to
+the releases repository and update the update.json in here.
+
 ## License
 
 This program is under the GPLv3. It downloads and bundles software with different licenses:
