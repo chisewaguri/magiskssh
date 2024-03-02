@@ -12,7 +12,8 @@ This is an SSH server running as root using the great Magisk systemless root sui
 
 ## Installation
 
-Download the zip file and install it via the Magisk Manager app. Once this module is available in the Magisk module repository, you can just install it from there.
+Download the zip file and install it via the Magisk Manager app.
+Updates can be installed from within Magisk Manager itself.
 
 ## Configuration
 
@@ -40,8 +41,12 @@ If you wish to keep the runtime data for a later reinstallation of the module, c
 
 ## Contributing
 
-Please don't file Pull Requests against the module repository. The module building is an automated process and will overwrite any changes to the files in the module repository.
-Feel free to create a Merge Request against the [source repository](https://gitlab.com/d4rcm4rc/MagiskSSH), instead.
+Feel free to create a Merge Request against the [source repository](https://gitlab.com/d4rcm4rc/MagiskSSH).
+
+Over time, this project has worked with a few repositories
+(Magisk module repo, source repo at GitHub/GitLab, releases repo).
+Only the aforementioned source repository can accept contributions.
+The other repositories are dead-ends for different reasons.
 
 ## License
 
