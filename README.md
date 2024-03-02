@@ -7,7 +7,7 @@ Its core is a version of OpenSSH modified to be usable on Android. It also inclu
 
 This repository is a collection of build scripts for simply building an installable Magisk module. It can not be installed itself. Once I have a working installable package, I will link it here.
 
-It should run on all devices with Android API version 24 or higher (Android 7.0 Nougat and higher) that have [Magisk](https://github.com/topjohnwu/Magisk) installed. It includes binaries for arm, arm64, x86, x86_64. However I only tested it on my arm64 Samsung Galaxy S10+ running LineageOS 19.1.
+It should run on all devices with Android API version 24 or higher (Android 7.0 Nougat and higher) that have [Magisk](https://github.com/topjohnwu/Magisk) installed. It includes binaries for arm, arm64, x86, x86_64. However I only tested it on my arm64 Samsung Galaxy S10+ running LineageOS 20.
 
 ## Download and Install
 
@@ -35,7 +35,7 @@ Some changes to OpenSSH are used from [Arachnoid's SSHelper](https://arachnoid.c
 
 A zip file will be created in the build-directory. It can be copied to the Android device and installed via the Magisk Manager app.
 
-On my i7-6700k a full build takes about 4 minutes.
+On my i7-6700k a full build using all cores takes about 4 minutes.
 The Android-NDK path is set to `/opt/android-ndk` per default. It can be changed by passing `ANDROID_ROOT=/path/to/ndk` to make or exporting it:
 
     ...
@@ -45,10 +45,11 @@ The Android-NDK path is set to `/opt/android-ndk` per default. It can be changed
 ## Build Dependencies
 
 * Recent GNU/Linux system on amd64
-* Make. Only tested using GNU Make 4.3
-* Wget. Only tested using GNU Wget 1.21.3
+* Make. Only tested using GNU Make 4.4.1
+* Wget. Only tested using GNU Wget 1.21.4
 * Android NDK. Only tested using version r25c
-* Python3. Only tested using Python 3.10.10
+* Python3. Only tested using Python 3.11.8
+* 7z (or zip as fallback). Only tested
 
 Newer versions generally should work. Older versions may work or may not.
 
