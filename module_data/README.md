@@ -58,6 +58,14 @@ The other repositories are dead-ends for different reasons.
 
 ## Changelog
 
+###### 2024-03-02, v0.17
+
+Thanks to osm0sis for all changes in this version (MR !6).
+
+- Provide binaries in /system/bin so they can be used from anywhere
+- Improve permissions for installed directories
+- Check user before running any binary
+
 ###### 2023-08-05, v0.16
 
 - Version bump. (thanks HiWhatName)
