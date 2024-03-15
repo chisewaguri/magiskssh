@@ -1,6 +1,6 @@
 {
-    "version": "v0.17",
-    "versionCode": 17,
-    "zipUrl": "https://gitlab.com/d4rcm4rc/MagiskSSH_releases/-/raw/master/magisk_ssh_v0.17.zip",
+    "version": "v0.18",
+    "versionCode": 18,
+    "zipUrl": "https://gitlab.com/d4rcm4rc/MagiskSSH_releases/-/raw/master/magisk_ssh_v0.18.zip",
     "changelog": "https://gitlab.com/d4rcm4rc/MagiskSSH/-/raw/master/module_data/README.md"
 }
