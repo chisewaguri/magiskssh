@@ -58,6 +58,12 @@ The other repositories are dead-ends for different reasons.
 
 ## Changelog
 
+###### 2024-06-29, v0.19
+
+- Version bump.
+- OpenSSL 3.3.1
+- Rsync 3.3.0
+
 ###### 2024-03-15, v0.18
 
 - Version bump.
