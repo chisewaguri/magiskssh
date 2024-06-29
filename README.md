@@ -58,7 +58,9 @@ Newer versions generally should work. Older versions may work or may not.
 A version bump for these two packages is pretty straightforward:
 
 - Enter the new version in openssl.mk or rsync.mk
-- run `make update_openssl_with_tofu` or `make update_rsync_with_tofu` to generate checksums
+- these commands will download and generate checksums for each package:
+  - `make -f all_arches.mk update_openssl_with_tofu`
+  - `make -f all_arches.mk update_rsync_with_tofu`
 - Update the module version and go through the checklist
 - Delete build and src directories and rebuild the whole module
 
