@@ -58,7 +58,7 @@ The other repositories are dead-ends for different reasons.
 
 ## Changelog
 
-###### 2023-03-15, v0.18
+###### 2024-03-15, v0.18
 
 - Version bump.
 - OpenSSL 3.2.1
