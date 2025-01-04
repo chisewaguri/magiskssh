@@ -50,7 +50,7 @@ The other repositories are dead-ends for different reasons.
 
 ## License
 
-[GPL v3](https://gitlab.com/d4rcm4rc/MagiskSSH/blob/master/LICENSE)
+[GPL v3](https://gitlab.com/d4rcm4rc/MagiskSSH/blob/main/LICENSE)
 
 ## Links
 
