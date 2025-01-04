@@ -1,5 +1,5 @@
 $(eval $(call start_package))
-OPENSSH?=openssh-9.7p1
+OPENSSH?=openssh-9.9p1
 
 PACKAGE=openssh
 
@@ -10,11 +10,12 @@ DOWNLOAD_URL:=ftp://mirror.hs-esslingen.de/pub/OpenBSD/OpenSSH/portable/$(ARCHIV
 CFLAGS+=-I$(BUILD_DIR)/openssl/include
 LDFLAGS+=-L$(BUILD_DIR)/openssl/
 
-PACKAGE_INSTALLED_FILES:= $(BUILD_DIR)/usr/bin/ssh         \
-                          $(BUILD_DIR)/usr/bin/sshd        \
-                          $(BUILD_DIR)/usr/bin/sftp        \
-                          $(BUILD_DIR)/usr/bin/scp         \
-                          $(BUILD_DIR)/usr/bin/sftp-server \
+PACKAGE_INSTALLED_FILES:= $(BUILD_DIR)/usr/bin/ssh          \
+                          $(BUILD_DIR)/usr/bin/sshd         \
+                          $(BUILD_DIR)/usr/bin/sshd-session \
+                          $(BUILD_DIR)/usr/bin/sftp         \
+                          $(BUILD_DIR)/usr/bin/scp          \
+                          $(BUILD_DIR)/usr/bin/sftp-server  \
                           $(BUILD_DIR)/usr/bin/ssh-keygen
 
 PACKAGE_WANT_PREPARE=true
@@ -30,9 +31,11 @@ $(BUILD_DIR)/$(PACKAGE)/stamp.configured: $(SRC_DIR)/$(PACKAGE)/stamp.prepared $
 	  CPPFLAGS="$(CFLAGS) -DHAVE_ATTRIBUTE__SENTINEL__=1 -DHAVE__RES_EXTERN=1"             \
 	  --disable-utmpx --disable-utmp --disable-wtmp --disable-wtmpx                        \
 	  --sysconfdir=/data/ssh --with-pid-dir=/data/ssh                                      \
+	  --libexecdir=/system/usr/libexec/ssh-core                                            \
 	  --with-maildir=/var/mail                                                             \
 	  --with-default-path="/system/bin:/system/xbin:/system/sbin:/magisk/ssh/usr/bin"      \
-	  --with-superuser-path="/system/bin:/system/xbin:/system/sbin:/magisk/ssh/usr/bin"
+	  --with-superuser-path="/system/bin:/system/xbin:/system/sbin:/magisk/ssh/usr/bin"    \
+	  --with-privsep-user=root --with-privsep-path=/
 	sed -i -e 's:/\* #undef HAVE_MBLEN \*/:#define HAVE_MBLEN 1:'                          \
 	       -e 's:/\* #undef HAVE_ENDGRENT \*/:#define HAVE_ENDGRENT 1:'                    \
 	       -e 's:/\* #undef HAVE_BZERO \*/:#define HAVE_BZERO 1:'                          \
@@ -56,6 +59,11 @@ $(BUILD_DIR)/usr/bin/sshd: $(BUILD_DIR)/$(PACKAGE)/stamp.built
 	mkdir -p $(BUILD_DIR)/usr/bin/
 	cp -u "$(BUILD_DIR)/$(PACKAGE)/sshd" "$(BUILD_DIR)/usr/bin/"
 	$(STRIP) "$(BUILD_DIR)/usr/bin/sshd"
+
+$(BUILD_DIR)/usr/bin/sshd-session: $(BUILD_DIR)/$(PACKAGE)/stamp.built
+	mkdir -p $(BUILD_DIR)/usr/bin/
+	cp -u "$(BUILD_DIR)/$(PACKAGE)/sshd-session" "$(BUILD_DIR)/usr/bin/"
+	$(STRIP) "$(BUILD_DIR)/usr/bin/sshd-session"
 
 $(BUILD_DIR)/usr/bin/sftp: $(BUILD_DIR)/$(PACKAGE)/stamp.built
 	mkdir -p $(BUILD_DIR)/usr/bin/
