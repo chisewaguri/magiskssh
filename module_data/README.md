@@ -58,6 +58,15 @@ The other repositories are dead-ends for different reasons.
 
 ## Changelog
 
+###### 2025-01-04, v0.20
+
+- Version bump.
+- OpenSSL 3.4.0
+- OpenSSH 9.9p1
+- Ship sshd-session binary from 9.8p1's sshd/sshd-session split
+- Use root+/ as privsep user+chroot instead of disabling privilege separation
+  You may want to remove "UsePrivilegeSeparation" no from your sshd-config!
+
 ###### 2024-06-29, v0.19
 
 - Version bump.
