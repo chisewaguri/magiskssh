@@ -1,5 +1,5 @@
 $(eval $(call start_package))
-RSYNC?=rsync-3.3.0
+RSYNC?=rsync-3.4.1
 
 PACKAGE:=rsync
 
