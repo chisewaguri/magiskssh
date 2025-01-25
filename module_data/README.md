@@ -58,6 +58,11 @@ The other repositories are dead-ends for different reasons.
 
 ## Changelog
 
+###### 2025-01-25, v0.21
+
+- Version bump.
+- Rsync 3.4.1
+
 ###### 2025-01-04, v0.20
 
 - Version bump.
