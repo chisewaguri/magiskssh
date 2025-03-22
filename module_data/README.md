@@ -58,6 +58,12 @@ The other repositories are dead-ends for different reasons.
 
 ## Changelog
 
+###### 2025-03-22, v0.22
+
+- Version bump.
+- OpenSSL 3.4.1
+- OpenSSH 9.9p2
+
 ###### 2025-01-25, v0.21
 
 - Version bump.
