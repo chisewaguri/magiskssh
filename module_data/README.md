@@ -5,8 +5,8 @@ This is an SSH server running as root using the great Magisk systemless root sui
 
 ## Included software
 
-* [OpenSSL 3.4.0](https://www.openssl.org/) (only needed for its libcrypto)
-* [OpenSSH 9.9p1](https://www.openssh.com/)
+* [OpenSSL 3.5.0](https://www.openssl.org/) (only needed for its libcrypto)
+* [OpenSSH 10.0p2](https://www.openssh.com/)
 * [Rsync 3.4.1](https://rsync.samba.org/)
 * [Magisk Module Installer](https://github.com/topjohnwu/magisk-module-installer)
 
@@ -57,6 +57,13 @@ The other repositories are dead-ends for different reasons.
 [Source Code Repository](https://gitlab.com/d4rcm4rc/MagiskSSH)
 
 ## Changelog
+
+###### 2025-05-24, v0.23
+
+- Version bump.
+- OpenSSL 3.5.0
+- OpenSSH 10.0p2
+- Ship sshd-auth binary from 10.0p1's sshd/sshd-auth split
 
 ###### 2025-03-22, v0.22
 
