@@ -1,5 +1,5 @@
 $(eval $(call start_package))
-OPENSSH?=openssh-9.9p2
+OPENSSH?=openssh-10.0p2
 
 PACKAGE=openssh
 
@@ -13,6 +13,7 @@ LDFLAGS+=-L$(BUILD_DIR)/openssl/
 PACKAGE_INSTALLED_FILES:= $(BUILD_DIR)/usr/bin/ssh          \
                           $(BUILD_DIR)/usr/bin/sshd         \
                           $(BUILD_DIR)/usr/bin/sshd-session \
+                          $(BUILD_DIR)/usr/bin/sshd-auth    \
                           $(BUILD_DIR)/usr/bin/sftp         \
                           $(BUILD_DIR)/usr/bin/scp          \
                           $(BUILD_DIR)/usr/bin/sftp-server  \
@@ -46,6 +47,9 @@ $(BUILD_DIR)/$(PACKAGE)/stamp.configured: $(SRC_DIR)/$(PACKAGE)/stamp.prepared $
 ifneq ($(IS_SRC_$(PACKAGE)_TARGET_PREPARED),true)
 IS_SRC_$(PACKAGE)_TARGET_PREPARED:=true
 $(SRC_DIR)/$(PACKAGE)/stamp.prepared: $(SRC_DIR)/$(PACKAGE)/stamp.unpacked
+	# HACK: 10.0p2 is packaged as p1
+	[ -d "$(SRC_DIR)/$(PACKAGE)/openssh-10.0p1" ]
+	mv "$(SRC_DIR)/$(PACKAGE)/openssh-10.0p1" "$(SRC_DIR)/$(PACKAGE)/$(OPENSSH)"
 	cd "$(SRC_DIR)/$(PACKAGE)/$(OPENSSH)"; patch -p1 < "$(ROOT_DIR)/patches/$(OPENSSH).patch"
 	$(make-prepared-stamp)
 endif
@@ -64,6 +68,11 @@ $(BUILD_DIR)/usr/bin/sshd-session: $(BUILD_DIR)/$(PACKAGE)/stamp.built
 	mkdir -p $(BUILD_DIR)/usr/bin/
 	cp -u "$(BUILD_DIR)/$(PACKAGE)/sshd-session" "$(BUILD_DIR)/usr/bin/"
 	$(STRIP) "$(BUILD_DIR)/usr/bin/sshd-session"
+
+$(BUILD_DIR)/usr/bin/sshd-auth: $(BUILD_DIR)/$(PACKAGE)/stamp.built
+	mkdir -p $(BUILD_DIR)/usr/bin/
+	cp -u "$(BUILD_DIR)/$(PACKAGE)/sshd-auth" "$(BUILD_DIR)/usr/bin/"
+	$(STRIP) "$(BUILD_DIR)/usr/bin/sshd-auth"
 
 $(BUILD_DIR)/usr/bin/sftp: $(BUILD_DIR)/$(PACKAGE)/stamp.built
 	mkdir -p $(BUILD_DIR)/usr/bin/
