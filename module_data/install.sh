@@ -148,7 +148,7 @@ on_install() {
   mv "$TMPDIR/arch/$ARCH/bin"/* "$MODPATH/system/usr/libexec/ssh-core"
 
   ui_print "[3/7] Configuring library path wrapper"
-  for f in scp sftp sftp-server ssh ssh-keygen sshd sshd-session rsync; do
+  for f in scp sftp sftp-server ssh ssh-keygen sshd sshd-session sshd-auth rsync; do
     ln -s /system/usr/libexec/ssh-core/wrapper "$MODPATH/system/bin/$f"
   done
 
