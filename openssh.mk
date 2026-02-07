@@ -47,9 +47,6 @@ $(BUILD_DIR)/$(PACKAGE)/stamp.configured: $(SRC_DIR)/$(PACKAGE)/stamp.prepared $
 ifneq ($(IS_SRC_$(PACKAGE)_TARGET_PREPARED),true)
 IS_SRC_$(PACKAGE)_TARGET_PREPARED:=true
 $(SRC_DIR)/$(PACKAGE)/stamp.prepared: $(SRC_DIR)/$(PACKAGE)/stamp.unpacked
-	# HACK: 10.0p2 is packaged as p1
-	[ -d "$(SRC_DIR)/$(PACKAGE)/openssh-10.0p1" ]
-	mv "$(SRC_DIR)/$(PACKAGE)/openssh-10.0p1" "$(SRC_DIR)/$(PACKAGE)/$(OPENSSH)"
 	cd "$(SRC_DIR)/$(PACKAGE)/$(OPENSSH)"; patch -p1 < "$(ROOT_DIR)/patches/$(OPENSSH).patch"
 	$(make-prepared-stamp)
 endif
