@@ -4,7 +4,8 @@ bindir="$(dirname "$(realpath "$0")")"
 execname="$(basename "$0")"
 
 if [ "$USER" == "root" -o "$(whoami 2>/dev/null)" == "root" ]; then
-  exec env LD_LIBRARY_PATH=/system/usr/lib "$bindir/$execname" "$@"
+  exec env LD_LIBRARY_PATH=/data/adb/ssh/usr/lib "$bindir/$execname" "$@"
 else
   echo "$execname: need root permissions"
 fi
+  

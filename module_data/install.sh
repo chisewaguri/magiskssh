@@ -133,24 +133,36 @@ on_install() {
   local TMPDIR="$MODPATH/tmp"
   ui_print "[0/7] Preparing module directory"
   mkdir -p "$TMPDIR"
-  mkdir -p "$MODPATH/system/bin"
-  mkdir -p "$MODPATH/system/usr/libexec/ssh-core"
+  mkdir -p "/data/adb/ssh/bin"
+  mkdir -p "/data/adb/ssh/usr/libexec/ssh-core"
 
   ui_print "[1/7] Extracting architecture unspecific module files"
   unzip -o "$ZIPFILE" 'common/opensshd.init' -d "$MODPATH/tmp" >&2
   unzip -o "$ZIPFILE" 'common/wrapper' -d "$MODPATH/tmp" >&2
   mv "$TMPDIR/common/opensshd.init" "$MODPATH"
-  mv "$TMPDIR/common/wrapper" "$MODPATH/system/usr/libexec/ssh-core"
+  mv "$TMPDIR/common/wrapper" "/data/adb/ssh/usr/libexec/ssh-core"
 
   ui_print "[2/7] Extracting libraries and binaries for $ARCH"
   unzip -o "$ZIPFILE" "arch/$ARCH/*" -d "$TMPDIR" >&2
-  mv "$TMPDIR/arch/$ARCH/lib" "$MODPATH/system/usr"
-  mv "$TMPDIR/arch/$ARCH/bin"/* "$MODPATH/system/usr/libexec/ssh-core"
+  mv "$TMPDIR/arch/$ARCH/lib" "/data/adb/ssh/usr"
+  mv "$TMPDIR/arch/$ARCH/bin"/* "/data/adb/ssh/usr/libexec/ssh-core"
 
   ui_print "[3/7] Configuring library path wrapper"
+  if [ "$KSU" = true ]; then
+      BINDIR=/data/adb/ksu/bin
+  elif [ "$APATCH" = true ]; then
+      BINDIR=/data/adb/ap/bin
+  else
+      # Magisk — use system overlay
+      BINDIR="$MODPATH/system/bin"
+  fi
+
   for f in scp sftp sftp-server ssh ssh-keygen sshd sshd-session sshd-auth rsync; do
-    ln -s /system/usr/libexec/ssh-core/wrapper "$MODPATH/system/bin/$f"
+      ln -s /data/adb/ssh/usr/libexec/ssh-core/wrapper "$BINDIR/$f"
   done
+  
+  # set prefix according to bindir
+  sed -i "s#^prefix=.*#prefix=${BINDIR%/bin}#" "$MODPATH/opensshd.init"
 
   ui_print "[4/7] Creating SSH user directories"
   mkdir -p /data/ssh
