@@ -1,4 +1,15 @@
-An SSH server for Android devices having Magisk (build system)
+## MagiskSSH (Mountless Fork)
+a personal fork of https://gitlab.com/d4rcm4rc/MagiskSSH
+
+mounting is not needed for this module to work on APatch or KSU and mounting also creates detection points. unnecessary mounting bad.
+
+this fork's main purpose is to make the module mountless on KSU and APatch, since they inject their bin directory under /data/adb into PATH, so there's no need to mount anything to /system/bin. 
+
+main changes made are:
+  - move lib and libexec to /data/adb/ssh
+  - use ksu and ap bin directory for the ssh binaries
+
+An SSH server for Android devices having Magisk/KSU (build system)
 ==============================================================
 
 This is my WIP for a fully functional system-daemon-like SSH server for Android devices.
