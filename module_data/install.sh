@@ -158,6 +158,7 @@ on_install() {
   fi
 
   for f in scp sftp sftp-server ssh ssh-keygen sshd sshd-session sshd-auth rsync; do
+      rm -rf "$BINDIR/$f"
       ln -s /data/adb/ssh/usr/libexec/ssh-core/wrapper "$BINDIR/$f"
   done
   
