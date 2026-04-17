@@ -1,5 +1,5 @@
 id=ssh
-name=SSH for Magisk
+name=SSH for Magisk (nomount)
 version=v0.26
 versionCode=26
 author=D4rCM4rC and Contributors
