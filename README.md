@@ -48,8 +48,8 @@ The Android-NDK path is set to `/opt/android-ndk` per default. It can be changed
 * Make. Only tested using GNU Make 4.4.1
 * Wget. Only tested using GNU Wget 1.25.0
 * Android NDK. Only tested using version r29
-* Python3. Only tested using Python 3.13.12
-* 7z (or zip as fallback). Only tested 17.05
+* Python3. Only tested using Python 3.14.6
+* 7z (or zip as fallback). Only tested 26.02
 
 Newer versions generally should work. Older versions may work or may not.
 
