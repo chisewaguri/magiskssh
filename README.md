@@ -1,3 +1,15 @@
+This project is abandoned
+=========================
+
+At the moment, I don't have a rooted device, which means that I'm not able to
+test my builds.
+As it's not usually much work, I may still occasionally bump the versions of
+OpenSSL, openSSH and Rsync and push that, although that may happen much less
+often than previously.
+Still, as it would be negligent to just push untested stuff to the auto updater,
+I'll leave the update.json at the last version I was able to test myself, 0.27.
+
+
 An SSH server for Android devices having Magisk (build system)
 ==============================================================
 
