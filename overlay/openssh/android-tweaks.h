@@ -24,6 +24,7 @@ struct spwd {
 struct passwd* getpwuida(uid_t uid);
 struct passwd* getpwnama(const char *name);
 struct spwd *getspnam(const char *name);
+char *crypt(const char *, const char *);
 
 const char* get_path_android(char root);
 
