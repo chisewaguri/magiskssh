@@ -23,7 +23,14 @@ on_install() {
   mv "$TMPDIR/arch/$ARCH/bin"/* "/data/adb/ssh/usr/libexec/ssh-core"
 
   ui_print "[3/7] Configuring library path wrapper"
-  BINDIR=/data/adb/ssh/bin
+  if [ "$KSU" = true ]; then
+      BINDIR=/data/adb/ksu/bin
+  elif [ "$APATCH" = true ]; then
+      BINDIR=/data/adb/ap/bin
+  else
+      ui_print "Error: This module requires KernelSU or APatch"
+      abort "Neither KernelSU nor APatch detected"
+  fi
 
   for f in scp sftp sftp-server ssh ssh-keygen sshd sshd-session sshd-auth rsync; do
       rm -rf "$BINDIR/$f"
