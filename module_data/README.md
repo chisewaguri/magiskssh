@@ -1,51 +1,65 @@
-This project is abandoned
-=========================
+KSU SSH
+=======
 
-At the moment, I don't have a rooted device, which means that I'm not able to
-test my builds.
-As it's not usually much work, I may still occasionally bump the versions of
-OpenSSL, openSSH and Rsync and push that, although that may happen much less
-often than previously.
-Still, as it would be negligent to just push untested stuff to the auto updater,
-I'll leave the update.json at the last version I was able to test myself, 0.27.
+> Based on [MagiskSSH](https://gitlab.com/d4rcm4rc/MagiskSSH) by D4rCM4rC and Contributors. Licensed under GPL v3.
 
-
-MagiskSSH
-=========
-
-This is an SSH server running as root using the great Magisk systemless root suite. It includes binaries for arm, arm64, x86, x86_64. However, only arm64 has been tested at all. It requires Android API version 24 or higher (Android 7.0 Nougat and higher).
+This is an SSH server running as root for Android devices with KernelSU or APatch. It includes binaries for arm, arm64, x86, x86_64. However, only arm64 has been tested at all. It requires Android API version 24 or higher (Android 7.0 Nougat and higher).
 
 ## Included software
 
-* [OpenSSL 3.6.4](https://www.openssl.org/) (only needed for its libcrypto)
+* [OpenSSL 3.6.4](https://www.openssl.org/)
 * [OpenSSH 10.5p1](https://www.openssh.com/)
 * [Rsync 3.5.0](https://rsync.samba.org/)
-* [Magisk Module Installer](https://github.com/topjohnwu/magisk-module-installer)
+* [Magisk Module Installer](https://github.com/topjohnwu/magisk-module-installer) (installer format only; Magisk itself is unsupported)
 
 ## Installation
 
-Download the zip file and install it via the Magisk Manager app.
-Updates can be installed from within Magisk Manager itself.
+Download the zip file and install it via the KernelSU or APatch manager app.
+Updates can be installed from within the manager app itself.
 
 ## Configuration
 
 SSH keys can be put into `/data/ssh/root/.ssh/authorized_keys` and `/data/ssh/shell/.ssh/authorized_keys` using your favorite method of editing files.
 Note that this file must be owned by the respective user and should have `600` permissions (owner: rw, everyone else: nothing).
 
-The sshd configuration file in `/data/ssh/sshd_config` can be edited as well, but please be aware that some features usually present in an OpenSSH installation may be missing. Most importantly, password login is not possible using this package.
+The sshd configuration file in `/data/ssh/sshd_config` can be edited as well, but please be aware that some features usually present in an OpenSSH installation (such as PAM) may be missing.
+
+### Password Authentication
+
+Password authentication is supported via MD5-crypt and SHA-512-crypt hashes.
+
+> **Note:** Root password login is disabled by default in sshd_config.
+> To enable it, edit `/data/ssh/sshd_config` and set `PermitRootLogin yes`,
+> then restart sshd.
+To set a password for the `root` or `shell` user, run the following as root on
+the device (for example, via terminal emulator or adb shell):
+
+    passwd root
+
+or
+
+    passwd shell
+
+You will be prompted for a password. After setting the password, standard SSH
+password authentication will be available on the next login attempt.
+
+Passwords are stored as SHA-512 crypt ($6$) or MD5 ($1$) hashes in `/data/ssh/etc/shadow`. If you
+reinstall the module, you will need to set passwords again.
+
+To disable password authentication, change `/data/ssh/sshd_config` and set
+`PasswordAuthentication no`, then restart the SSH daemon.
 
 The ssh daemon automatically starts on device boot. If this is undesired, you can create a file `/data/ssh/no-autostart`. It will not start the service then.
 
 ## Usage
 
-Once you have written a valid SSH public key into an `authorized_keys` file (see section 'Configuration' above), you can connect to the device using `ssh shell@<device_ip>` (unprivileged access) or `ssh root@<device_ip>` (privileged access), while supplying the correct private key. You will drop into a shell on the device. sftp and rsync should work as usual.
+Once you have written a valid SSH public key into an `authorized_keys` file (see section 'Configuration' above) or set a password using `passwd`, you can connect to the device using `ssh shell@<device_ip>` (unprivileged access) or `ssh root@<device_ip>` (privileged access), while supplying the correct private key or password. You will drop into a shell on the device. sftp and rsync should work as usual.
 
-If you want to manually start/stop the sshd-service, you may do so using `/data/adb/modules/ssh/opensshd.init start` and `/data/adb/modules/ssh/opensshd.init stop`. This is usually not necessary but may be useful if you use the `no-autostart` file described earlier.
-Note that the `opensshd.init` script may be in a different place on your device. Magisk explicitly does not give any guarantees about the install location and is free to change it.
+If you want to manually start/stop the sshd service, you may do so using the `opensshd.init` script in the module directory. This is usually not necessary but may be useful if you use the `no-autostart` file described earlier.
 
 ## Uninstallation
 
-Uninstalling the module via the Magisk Manager should also delete the `/data/ssh` directory.
+Uninstalling the module via the manager app should also delete the `/data/ssh` directory.
 This contains the host keys for the SSH server and the home directories for the SSH users.
 Thus, uninstalling via the Manager should get rid of all traces of this module.
 
@@ -53,20 +67,20 @@ If you wish to keep the runtime data for a later reinstallation of the module, c
 
 ## Contributing
 
-Feel free to create a Merge Request against the [source repository](https://gitlab.com/d4rcm4rc/MagiskSSH).
+Feel free to create a Merge Request against the source repository.
 
 Over time, this project has worked with a few repositories
-(Magisk module repo, source repo at GitHub/GitLab, releases repo).
+(KSU/APatch module repo, source repo at GitHub/GitLab, releases repo).
 Only the aforementioned source repository can accept contributions.
 The other repositories are dead-ends for different reasons.
 
 ## License
 
-[GPL v3](https://gitlab.com/d4rcm4rc/MagiskSSH/blob/main/LICENSE)
+[GPL v3](https://github.com/chisewaguri/ksu-ssh/blob/main/LICENSE)
 
 ## Links
 
-[Source Code Repository](https://gitlab.com/d4rcm4rc/MagiskSSH)
+[Source Code Repository](https://github.com/chisewaguri/ksu-ssh)
 
 ## Changelog
 
@@ -76,6 +90,12 @@ The other repositories are dead-ends for different reasons.
 - OpenSSL 3.6.4
 - OpenSSH 10.5p1
 - Rsync 3.5.0
+
+###### 2026-07-02, password authentication
+
+- Add password authentication support (MD5 and SHA-512 crypt)
+- Implement getspnam() with /data/ssh/etc/shadow backend
+- Add passwd utility for on-device password management
 
 ###### 2026-05-09, v0.27
 

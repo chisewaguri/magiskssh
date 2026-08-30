@@ -1,41 +1,39 @@
-This project is abandoned
-=========================
+## KSU SSH
 
-At the moment, I don't have a rooted device, which means that I'm not able to
-test my builds.
-As it's not usually much work, I may still occasionally bump the versions of
-OpenSSL, openSSH and Rsync and push that, although that may happen much less
-often than previously.
-Still, as it would be negligent to just push untested stuff to the auto updater,
-I'll leave the update.json at the last version I was able to test myself, 0.27.
+A mountless OpenSSH server for Android devices with KernelSU or APatch.
 
+> **Credits:** This project is a fork of [MagiskSSH](https://gitlab.com/d4rcm4rc/MagiskSSH) by **D4rCM4rC and Contributors**
 
-An SSH server for Android devices having Magisk (build system)
-==============================================================
+Main changes from upstream:
+  - Mountless: binaries in `/data/adb/ssh`, no system partition mounts
+  - Password authentication
+  - Requires KernelSU or APatch (Magisk not supported)
 
-This is my WIP for a fully functional system-daemon-like SSH server for Android devices.
+An SSH server for Android devices having KernelSU / APatch
+========================================================================
 
-Its core is a version of OpenSSH modified to be usable on Android. It also includes rsync (which actually was my main motivation for this project). It will be available for devices using the architectures arm, arm64, x86, x86_64.
+This is a fully functional system-daemon-like SSH server for Android devices.
 
-This repository is a collection of build scripts for simply building an installable Magisk module. It can not be installed itself. Once I have a working installable package, I will link it here.
+Its core is a version of OpenSSH modified to be usable on Android. It also includes rsync. It is available for arm, arm64, x86, and x86_64 architectures.
 
-It should run on all devices with Android API version 24 or higher (Android 7.0 Nougat and higher) that have [Magisk](https://github.com/topjohnwu/Magisk) installed. It includes binaries for arm, arm64, x86, x86_64. However I only tested it on my arm64 Samsung Galaxy S10+ running LineageOS 20.
+This repository is a collection of build scripts for building an installable KSU/APatch module. It cannot be installed itself.
+
+It requires Android API version 24 or higher (Android 7.0 Nougat and higher).
 
 ## Download and Install
 
-The module can be downloaded in the [Releases repository](https://gitlab.com/d4rcm4rc/MagiskSSH_releases). Once Gitlab raises their size limit on tag-attachments, the releases will migrate there. Further hints for installation, configuration and usage can be found [in the module's README.md](module_data/README.md).
+Pre-built ZIPs are available from the releases page. Further hints for installation, configuration and usage can be found in [the module's README.md](module_data/README.md).
 
-You don't trust me and don't want to use binaries I compiled? No problem at all! Just head to [How To Build](#how-to-build), grab the source code, check it and compile it yourself.
-
+You don't trust me and don't want to use binaries I compiled? No problem! Just head to [How To Build](#how-to-build), grab the source code, check it and compile it yourself.
 
 ## Used Packages and Included Resources
 
-* [OpenSSL](https://www.openssl.org/) (only needed for its libcrypto)
+* [OpenSSL](https://www.openssl.org/)
 * [OpenSSH](https://www.openssh.com/)
 * [Rsync](https://rsync.samba.org/)
-* [Magisk Module Template](https://github.com/topjohnwu/magisk-module-template)
+* [Magisk Module Installer](https://github.com/topjohnwu/magisk-module-installer) (installer format shared by KernelSU and APatch; Magisk itself is unsupported)
 
-Some changes to OpenSSH are used from [Arachnoid's SSHelper](https://arachnoid.com/android/SSHelper/). Also I have to partially ship a version of `resolv.h` from my system. It is, as far as I can tell, an 'internal-only' header and not included in the Android NDK. Still OpenSSH somehow needs it to compile.
+Some changes to OpenSSH are used from [Arachnoid's SSHelper](https://arachnoid.com/android/SSHelper/).
 
 ## How To Build
 
@@ -45,7 +43,7 @@ Some changes to OpenSSH are used from [Arachnoid's SSHelper](https://arachnoid.c
     cd build
     make -f ../all_arches.mk -j8 zip
 
-A zip file will be created in the build-directory. It can be copied to the Android device and installed via the Magisk Manager app.
+A zip file will be created in the build-directory. It can be copied to the Android device and installed via the KSU or APatch manager app.
 
 On my i7-6700k a full build using all cores takes about 4 minutes.
 The Android-NDK path is set to `/opt/android-ndk` per default. It can be changed by passing `ANDROID_ROOT=/path/to/ndk` to make or exporting it:
@@ -59,9 +57,9 @@ The Android-NDK path is set to `/opt/android-ndk` per default. It can be changed
 * Recent GNU/Linux system on amd64
 * Make. Only tested using GNU Make 4.4.1
 * Wget. Only tested using GNU Wget 1.25.0
-* Android NDK. Only tested using version r29
-* Python3. Only tested using Python 3.14.6
-* 7z (or zip as fallback). Only tested 26.02
+* Android NDK. Only tested using version r25c
+* Python3. Only tested using Python 3.13.3
+* 7z (or zip as fallback). Only tested 17.05
 
 Newer versions generally should work. Older versions may work or may not.
 
