@@ -29,6 +29,31 @@ await new Promise((resolve, reject) => {
   });
 });
 
+globalThis.ksu = {
+  exec(command, encodedOptions, callbackName) {
+    assert.equal(
+      command,
+      "'/data/adb/ssh/bin/ksu-ssh-webui' 'settings' 'set' 'autostart' '1'",
+    );
+    assert.deepEqual(JSON.parse(encodedOptions), {});
+    setTimeout(() => window[callbackName](0, "ok from exec\n", ""), 0);
+  },
+};
+
+await new Promise((resolve, reject) => {
+  const child = spawn("/data/adb/ssh/bin/ksu-ssh-webui", ["settings", "set", "autostart", "1"]);
+  let output = "";
+  child.stdout.on("data", (data) => { output += data; });
+  child.on("error", reject);
+  child.on("exit", (code) => {
+    try {
+      assert.equal(Number(code), 0);
+      assert.equal(output, "ok from exec\n");
+      resolve();
+    } catch (error) { reject(error); }
+  });
+});
+
 delete globalThis.ksu;
 
 await new Promise((resolve, reject) => {

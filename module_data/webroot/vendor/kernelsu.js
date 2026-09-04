@@ -45,6 +45,10 @@ function ChildProcess() {
 ChildProcess.prototype.on = Stdio.prototype.on;
 ChildProcess.prototype.emit = Stdio.prototype.emit;
 
+function shellQuote(value) {
+  return `'${String(value).replace(/'/g, `'\\''`)}'`;
+}
+
 export function spawn(command, args, options) {
   if (typeof args === "undefined") args = [];
   else if (!(args instanceof Array)) { options = args; args = []; }
@@ -58,6 +62,22 @@ export function spawn(command, args, options) {
       child.stderr.emit("data", "ksu is not defined");
       child.emit("exit", 1);
     }, 0);
+    return child;
+  }
+  if (typeof ksu.spawn !== "function" && typeof ksu.exec === "function") {
+    const commandLine = [command, ...args].map(shellQuote).join(" ");
+    window[name] = (errno, stdout, stderr) => {
+      if (stdout) child.stdout.emit("data", stdout);
+      if (stderr) child.stderr.emit("data", stderr);
+      child.emit("exit", errno);
+    };
+    try { ksu.exec(commandLine, JSON.stringify(options), name); }
+    catch (error) {
+      setTimeout(() => {
+        child.emit("error", error);
+        delete window[name];
+      }, 0);
+    }
     return child;
   }
   try { ksu.spawn(command, JSON.stringify(args), JSON.stringify(options), name); }
