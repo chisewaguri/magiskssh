@@ -1,111 +1,207 @@
-## KSU SSH
+# KSU SSH
 
-A mountless OpenSSH server for Android devices with KernelSU or APatch.
+KSU SSH runs OpenSSH and Rsync on Android devices with KernelSU or APatch. It
+does not mount files into the system partition. Runtime files live under
+`/data/adb/ssh`, and SSH terminals use a private `devpts` instance.
 
-> **Credits:** This project is a fork of [MagiskSSH](https://gitlab.com/d4rcm4rc/MagiskSSH) by **D4rCM4rC and Contributors**
+This project is based on
+[MagiskSSH](https://gitlab.com/d4rcm4rc/MagiskSSH) by D4rCM4rC and its
+contributors.
 
-Main changes from upstream:
-  - Mountless: binaries in `/data/adb/ssh`, no system partition mounts
-  - Password authentication
-  - Requires KernelSU or APatch (Magisk not supported)
+## Features
 
-An SSH server for Android devices having KernelSU / APatch
-========================================================================
+- Supports KernelSU and APatch. Magisk is not supported.
+- Runs on arm, arm64, x86, and x86_64 devices with Android 7.0 or newer.
+- Includes OpenSSH, OpenSSL, and Rsync.
+- Supports authorized keys and password authentication for `root` and `shell`.
+- Starts SSH sessions with a private `devpts` instance.
+- Includes a WebUI for service control, keys, settings, and raw configuration.
 
-This is a fully functional system-daemon-like SSH server for Android devices.
+## Install the module
 
-Its core is a version of OpenSSH modified to be usable on Android. It also includes rsync. It is available for arm, arm64, x86, and x86_64 architectures.
+1. Download the ZIP artifact from a successful
+   [Build ksu-ssh workflow](https://github.com/chisewaguri/ksu-ssh/actions/workflows/build.yml),
+   or [build the module from source](#build-from-source).
+2. Open KernelSU or APatch.
+3. Install the ZIP as a module.
+4. Restart the device.
 
-This repository is a collection of build scripts for building an installable KSU/APatch module. It cannot be installed itself.
+The module starts SSH after boot unless you disable **Start on boot** in the
+WebUI.
 
-It requires Android API version 24 or higher (Android 7.0 Nougat and higher).
+## Manage SSH in the WebUI
 
-## Download and Install
+Open KSU SSH from the module list in KernelSU or APatch. The WebUI has three
+pages.
 
-Pre-built ZIPs are available from the releases page. Further hints for installation, configuration and usage can be found in [the module's README.md](module_data/README.md).
+### Home
 
-You don't trust me and don't want to use binaries I compiled? No problem! Just head to [How To Build](#how-to-build), grab the source code, check it and compile it yourself.
+Use **Home** to start, stop, or restart the SSH service. Starting and restarting
+SSH always use the private `devpts` launcher.
 
-## Used Packages and Included Resources
+The **Service settings** group contains:
 
-* [OpenSSL](https://www.openssl.org/)
-* [OpenSSH](https://www.openssh.com/)
-* [Rsync](https://rsync.samba.org/)
-* [Magisk Module Installer](https://github.com/topjohnwu/magisk-module-installer) (installer format shared by KernelSU and APatch; Magisk itself is unsupported)
+- **Start on boot**: Starts SSH after the device boots.
+- **Port**: Sets the listening port from `1` through `65535`.
 
-Some changes to OpenSSH are used from [Arachnoid's SSHelper](https://arachnoid.com/android/SSHelper/).
+The **Login methods** group separates access by account:
 
-## How To Build
+- **Shell → Password login**: Lets `shell` sign in with its password.
+- **Root → Key login**: Lets `root` sign in with an authorized key.
+- **Root → Password login**: Also lets `root` sign in with its password. This
+  option requires both shell password login and root key login.
 
-    <clone or download>
-    cd <source dir>
-    mkdir build
-    cd build
-    make -f ../all_arches.mk -j8 zip
+Setting changes do not restart SSH. They apply the next time SSH starts.
 
-A zip file will be created in the build-directory. It can be copied to the Android device and installed via the KSU or APatch manager app.
+The default login settings are:
 
-On my i7-6700k a full build using all cores takes about 4 minutes.
-The Android-NDK path is set to `/opt/android-ndk` per default. It can be changed by passing `ANDROID_ROOT=/path/to/ndk` to make or exporting it:
+| Account | Authorized key | Password |
+| --- | --- | --- |
+| `shell` | Yes | Yes |
+| `root` | Yes | No |
 
-    ...
-    export ANDROID_ROOT=/path/to/ndk
-    make -f ../all_arches.mk -j8 zip
+### Keys
 
-## Build Dependencies
+Use **Keys** to manage the `root` and `shell` authorized-key files. The WebUI
+accepts one valid OpenSSH public key at a time, rejects duplicates, and shows
+the key type, fingerprint, and comment.
 
-* Recent GNU/Linux system on amd64
-* Make. Only tested using GNU Make 4.4.1
-* Wget. Only tested using GNU Wget 1.25.0
-* Android NDK. Only tested using version r25c
-* Python3. Only tested using Python 3.13.3
-* 7z (or zip as fallback). Only tested 17.05
+The WebUI stores keys in:
 
-Newer versions generally should work. Older versions may work or may not.
+- `/data/ssh/root/.ssh/authorized_keys`
+- `/data/ssh/shell/.ssh/authorized_keys`
 
-## Version bumping OpenSSL and rsync
+It writes each file atomically and restores the correct owner and `0600` mode.
 
-A version bump for these two packages is pretty straightforward:
+### Advanced
 
-- Enter the new version in openssl.mk or rsync.mk
-- these commands will download and generate checksums for each package:
-  - `make -f all_arches.mk update_openssl_with_tofu`
-  - `make -f all_arches.mk update_rsync_with_tofu`
-- Update the module version and go through the checklist
-- Delete build and src directories and rebuild the whole module
+Use **Advanced** to edit `/data/ssh/sshd_config`. Before replacing the live
+file, the WebUI validates the candidate with `sshd -t` and saves the previous
+configuration as `/data/ssh/sshd_config.bak`.
 
-## Version bumping OpenSSH
+An invalid configuration does not replace the live file.
 
-A version bump for OpenSSH is more difficult. Basically, the same steps as for OpenSSL and rsync are required.
-OpenSSH however also needs a patch which is different for every version.
-To generate one for a new version do this:
+## Set account passwords
 
-- Unpack the new version's source to a directory twice (ie. `tar xzf openssh-version.tar.gz; mv openssh-version a; cp -a a b`)
-- Try to apply the patch to b, it will not patch without issues (`cd b; patch -p1 < path/to/previous.patch`)
-- Fix all errors and warnings
-- Remove the pre-patch backups and reject files
-- Possibly add more changes. Candidates are:
-  - Calls to getpwnam
-  - Calls to getpwuid
-  - Direct uses of /tmp as path for temporary files
-- Generate a new patch (`diff -urN a b > path/to/new.patch`)
-- Try to build the module. If not possible, fix errors and generate a new patch
+The WebUI does not handle plaintext passwords. Set passwords from a root shell
+on the device:
 
-## Checklist for a new version
+```sh
+passwd shell
+```
 
-- All packages have the correct version
-- For all updated packages checksum files have been generated
-- A new version is entered in module_data/module.prop under both `version` and `versionCode`
-- The module_data/README.md is updated to include the new package versions
-- An entry in the changelog in module_data/README.md is added
+To set the root password, run:
 
-Then we can create a full build (delete _build_ directory first), upload it to
-the releases repository and update the update.json in here.
+```sh
+passwd root
+```
+
+Passwords use SHA-512-crypt or MD5-crypt hashes in `/data/ssh/etc/shadow`.
+Updating the module preserves this file. A clean installation does not have an
+account password, so run `passwd` after installing it.
+
+## Connect to the device
+
+Connect as the unprivileged `shell` account:
+
+```sh
+ssh shell@DEVICE_IP
+```
+
+Connect as `root` when root login is enabled:
+
+```sh
+ssh root@DEVICE_IP
+```
+
+The SSH client asks for a password when no accepted key is available. SFTP,
+SCP, and Rsync use the same SSH server and credentials.
+
+## Manage files manually
+
+The WebUI is optional. You can edit the following files from a root shell:
+
+| Path | Purpose |
+| --- | --- |
+| `/data/ssh/sshd_config` | OpenSSH server configuration |
+| `/data/ssh/root/.ssh/authorized_keys` | Root authorized keys |
+| `/data/ssh/shell/.ssh/authorized_keys` | Shell authorized keys |
+| `/data/ssh/etc/shadow` | Password hashes |
+| `/data/ssh/no-autostart` | Disables automatic startup when present |
+
+Keep each `authorized_keys` file at mode `0600`. The root file must use
+`root:root`; the shell file must use `shell:shell`.
+
+## Uninstall the module
+
+Uninstall KSU SSH from KernelSU or APatch. The uninstaller removes
+`/data/adb/ssh` and `/data/ssh`, including host keys, passwords, configuration,
+and account home directories.
+
+To preserve `/data/ssh`, create this file before uninstalling:
+
+```sh
+touch /data/ssh/KEEP_ON_UNINSTALL
+```
+
+## Build from source
+
+Install GNU Make, Wget, Python 3, 7-Zip or Zip, and Android NDK r25c on a recent
+GNU/Linux amd64 system. Then run:
+
+```sh
+git clone https://github.com/chisewaguri/ksu-ssh.git
+cd ksu-ssh
+mkdir build
+cd build
+make -f ../all_arches.mk -j"$(nproc)" zip
+```
+
+The build writes the module ZIP to the `build` directory. To use another NDK
+location, pass `ANDROID_ROOT`:
+
+```sh
+make -f ../all_arches.mk -j"$(nproc)" zip ANDROID_ROOT=/path/to/android-ndk
+```
+
+## Update bundled software
+
+OpenSSL and Rsync updates use the version in their package makefile. After
+changing a version, regenerate its checksum with the matching target:
+
+```sh
+make -f all_arches.mk update_openssl_with_tofu
+make -f all_arches.mk update_rsync_with_tofu
+```
+
+OpenSSH updates also require a patch for the new release. Apply the previous
+patch to two unpacked source trees, fix rejected hunks, and generate the new
+patch from the resulting diff. Build every architecture before publishing the
+update.
+
+For every release:
+
+1. Update `version` and `versionCode` in `module_data/module.prop`.
+2. Update bundled software versions in this README.
+3. Add the release notes to [CHANGELOG.md](CHANGELOG.md).
+4. Build the module from a clean `build` and `src` directory.
+
+## Developer documentation
+
+See [WebUI architecture and controller protocol](docs/WEBUI.md) before changing
+the WebUI, its root controller, or SSH setting mappings.
+
+## Included software
+
+- [OpenSSL 3.6.4](https://www.openssl.org/)
+- [OpenSSH 10.5p1](https://www.openssh.com/)
+- [Rsync 3.5.0](https://rsync.samba.org/)
+- [Magisk Module Installer](https://github.com/topjohnwu/magisk-module-installer),
+  used only as the installer format
 
 ## License
 
-This program is under the GPLv3. It downloads and bundles software with different licenses:
+KSU SSH is licensed under [GPLv3](LICENSE). Bundled software keeps its own
+license. The vendored KernelSU JavaScript bridge is licensed under Apache-2.0.
 
-* OpenSSL [OpenSSL License](https://www.openssl.org/source/license.html)
-* OpenSSH [BSD License](https://www.openbsd.org/policy.html)
-* Rsync [GPL v3](https://rsync.samba.org/GPL.html)
+See [CHANGELOG.md](CHANGELOG.md) for release notes.
