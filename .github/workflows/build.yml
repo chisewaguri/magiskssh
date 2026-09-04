@@ -81,7 +81,7 @@ jobs:
           set -euo pipefail
           sh tests/test-webui-controller.sh
           sh tests/test-webui-static.sh
-          node --experimental-default-type=module tests/test-webui-bridge.mjs
+          node tests/test-webui-bridge.mjs
           mkdir -p build
           cd build
           make -f ../all_arches.mk -j$(nproc) zip ANDROID_ROOT=$NDK_PATH
