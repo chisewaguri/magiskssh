@@ -29,6 +29,10 @@ async function showPage(name) {
 
 function run(args) {
   return new Promise((resolve, reject) => {
+    if (typeof globalThis.ksu === "undefined") {
+      reject(new Error("Open this WebUI inside KernelSU or APatch"));
+      return;
+    }
     const child = spawn(CONTROLLER, args);
     let stdout = "";
     let stderr = "";
@@ -68,6 +72,21 @@ function notify(message) {
 
 function errorMessage(error) {
   return error instanceof Error ? error.message : String(error);
+}
+
+function showUnavailable(error) {
+  const message = errorMessage(error);
+  const badge = $("#service-badge");
+  badge.classList.remove("running");
+  badge.lastChild.textContent = "Unavailable";
+  $("#service-title").textContent = "Controls unavailable";
+  $("#service-detail").textContent = message;
+  $("#service-toggle").hidden = true;
+  $("#service-restart").hidden = true;
+  document.querySelectorAll(".page-panel button, .page-panel input").forEach((element) => {
+    element.disabled = true;
+  });
+  notify(message);
 }
 
 function setBusy(busy) {
@@ -177,11 +196,16 @@ function saved() {
 }
 
 async function setSetting(name, value) {
+  const previous = { ...state.settings };
   try {
     await run(["settings", "set", name, value]);
     await loadSettings();
     saved();
-  } catch (error) { await loadSettings(); notify(errorMessage(error)); }
+  } catch (error) {
+    state.settings = previous;
+    renderSettings();
+    notify(errorMessage(error));
+  }
 }
 
 $("#service-toggle").addEventListener("click", () => serviceAction(state.running ? "stop" : "start"));
@@ -232,4 +256,4 @@ $("#save-config").addEventListener("click", async () => {
   finally { button.disabled = false; }
 });
 
-Promise.all([loadService(), loadSettings(), loadKeys()]).catch((error) => notify(errorMessage(error)));
+Promise.all([loadService(), loadSettings(), loadKeys()]).catch(showUnavailable);
