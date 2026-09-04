@@ -71,10 +71,22 @@ jobs:
       - name: Build
         run: |
           set -euo pipefail
+          sh tests/test-webui-controller.sh
+          sh tests/test-webui-static.sh
           mkdir -p build
           cd build
           make -f ../all_arches.mk -j$(nproc) zip ANDROID_ROOT=$NDK_PATH
           ccache --show-stats
+
+      - name: Inspect WebUI package
+        run: |
+          set -euo pipefail
+          ZIP=$(find build -maxdepth 1 -name '*.zip' -print -quit)
+          test -n "$ZIP"
+          unzip -l "$ZIP" | grep -q 'webroot/index.html'
+          unzip -l "$ZIP" | grep -q 'webroot/app.js'
+          unzip -l "$ZIP" | grep -q 'webroot/style.css'
+          unzip -l "$ZIP" | grep -q 'common/ksu-ssh-webui'
 
       - name: Generate artifact name
         id: name
