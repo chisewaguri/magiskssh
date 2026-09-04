@@ -36,11 +36,25 @@ function run(args) {
     const child = spawn(CONTROLLER, args);
     let stdout = "";
     let stderr = "";
+    let settled = false;
+    const timeout = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      reject(new Error("The root command did not respond"));
+    }, 10000);
     child.stdout.on("data", (data) => { stdout += data; });
     child.stderr.on("data", (data) => { stderr += data; });
-    child.on("error", reject);
+    child.on("error", (error) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      reject(error);
+    });
     child.on("exit", (code) => {
-      if (code === 0) resolve(stdout);
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      if (Number(code) === 0) resolve(stdout);
       else reject(new Error(stderr.trim() || `Command failed (${code})`));
     });
   });

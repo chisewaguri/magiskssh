@@ -9,7 +9,7 @@ JavaScript framework, package manager, or build step.
 | Component | Installed location | Responsibility |
 | --- | --- | --- |
 | WebUI | Module `webroot` directory | Renders service state, keys, settings, and configuration |
-| KernelSU bridge | `webroot/vendor/kernelsu.js` | Provides the root `spawn()` API |
+| KernelSU bridge | `webroot/vendor/kernelsu.js` | Provides the root `spawn()` API through the vendored `kernelsu-alt` 3.1.2 implementation |
 | Controller | `/data/adb/ssh/bin/ksu-ssh-webui` | Validates requests and changes root-owned files |
 | Private terminal launcher | `/data/adb/ssh/usr/libexec/ssh-core/sshd-private-devpts` | Starts SSH with a private `devpts` instance |
 
@@ -145,6 +145,7 @@ root:
 ```sh
 sh tests/test-webui-controller.sh
 sh tests/test-webui-static.sh
+node tests/test-webui-bridge.mjs
 ```
 
 The integration test uses temporary SSH data and stubbed service commands. It
@@ -155,3 +156,6 @@ restart behavior.
 The static test checks the required files, local bridge import, fixed controller
 path, accessible labels, system theme support, reduced-motion support, and the
 absence of remote assets or `exec()` calls.
+
+The bridge test simulates the native `ksu.spawn` callback, including a string
+exit code, and checks asynchronous failure when the WebUI bridge is absent.

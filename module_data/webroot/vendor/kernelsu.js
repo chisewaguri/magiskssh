@@ -1,8 +1,12 @@
-// KernelSU JavaScript bridge 3.0.2. Copyright KernelSU contributors.
-// Vendored under the Apache License 2.0; see LICENSE-kernelsu.txt.
+// spawn() bridge adapted from kernelsu-alt 3.1.2 by KOWX712.
+// Derived from KernelSU and vendored under Apache-2.0; see LICENSE-kernelsu.txt.
 let callbackCounter = 0;
 function getUniqueCallbackName(prefix) {
   return `${prefix}_callback_${Date.now()}_${callbackCounter++}`;
+}
+
+export function isKsuWebui() {
+  return typeof globalThis.ksu !== "undefined";
 }
 
 export function exec(command, options) {
@@ -13,6 +17,11 @@ export function exec(command, options) {
       resolve({ errno, stdout, stderr });
       delete window[name];
     };
+    if (!isKsuWebui()) {
+      resolve({ errno: 1, stdout: "", stderr: "ksu is not defined" });
+      delete window[name];
+      return;
+    }
     try { ksu.exec(command, JSON.stringify(options), name); }
     catch (error) { reject(error); delete window[name]; }
   });
@@ -44,14 +53,29 @@ export function spawn(command, args, options) {
   const name = getUniqueCallbackName("spawn");
   window[name] = child;
   child.on("exit", () => { delete window[name]; });
+  if (!isKsuWebui()) {
+    setTimeout(() => {
+      child.stderr.emit("data", "ksu is not defined");
+      child.emit("exit", 1);
+    }, 0);
+    return child;
+  }
   try { ksu.spawn(command, JSON.stringify(args), JSON.stringify(options), name); }
-  catch (error) { child.emit("error", error); delete window[name]; }
+  catch (error) {
+    setTimeout(() => {
+      child.emit("error", error);
+      delete window[name];
+    }, 0);
+  }
   return child;
 }
 
 export function fullScreen(value) { ksu.fullScreen(value); }
 export function enableEdgeToEdge(value) { ksu.enableEdgeToEdge(value); }
-export function toast(message) { ksu.toast(message); }
+export function toast(message) {
+  if (isKsuWebui()) ksu.toast(message);
+  else console.log(message);
+}
 export function moduleInfo() { return ksu.moduleInfo(); }
 export function listPackages(type) {
   try { return JSON.parse(ksu.listPackages(type)); } catch (_) { return []; }

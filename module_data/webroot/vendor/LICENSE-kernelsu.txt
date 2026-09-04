@@ -1,5 +1,8 @@
-KernelSU JavaScript bridge version 3.0.2
-Copyright KernelSU contributors
+kernelsu-alt JavaScript bridge version 3.1.2
+Copyright KOWX712 and KernelSU contributors
+
+Source: github.com/KOWX712/kernelsu-alt
+Derived from the KernelSU JavaScript bridge.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
