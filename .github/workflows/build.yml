@@ -3,8 +3,16 @@ name: Build ksu-ssh
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'update.json'
   pull_request:
     branches: [ main ]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'update.json'
   workflow_dispatch:
 
 env:
