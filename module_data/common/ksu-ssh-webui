@@ -14,6 +14,7 @@ ROOT_GID=${SSH_ROOT_GID:-0}
 SHELL_UID=${SSH_SHELL_UID:-2000}
 SHELL_GID=${SSH_SHELL_GID:-2000}
 CONFIG=$DATA_DIR/sshd_config
+PID_FILE=${SSH_PID_FILE:-}
 
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-/data/adb/ssh/usr/lib}
 umask 077
@@ -244,10 +245,21 @@ service_action() {
 	esac
 }
 
+service_running() {
+	running_pid_file=${PID_FILE:-$(config_value PidFile "$DATA_DIR/sshd.pid")}
+	[ -r "$running_pid_file" ] || return 1
+	running_pid=$(cat "$running_pid_file" 2>/dev/null) || return 1
+	case "$running_pid" in
+		''|*[!0-9]*) return 1 ;;
+	esac
+	[ "$running_pid" -gt 1 ] 2>/dev/null || return 1
+	kill -0 "$running_pid" 2>/dev/null
+}
+
 command=${1:-}
 case "$command" in
 	state)
-		if "$INIT_SCRIPT" status >/dev/null 2>&1; then state=running; else state=stopped; fi
+		if service_running; then state=running; else state=stopped; fi
 		printf 'state\t%s\nport\t%s\n' "$state" "$(config_value Port 22)"
 		;;
 	service)

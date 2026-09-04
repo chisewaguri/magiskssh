@@ -3,7 +3,7 @@ set -eu
 
 root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 tmp=${TMPDIR:-/tmp}/ksu-ssh-webui-$$
-trap 'rm -rf "$tmp"' EXIT HUP INT TERM
+trap '[ -z "${service_pid:-}" ] || kill "$service_pid" 2>/dev/null || true; rm -rf "$tmp"' EXIT HUP INT TERM
 
 data=$tmp/data
 core=$tmp/core
@@ -35,7 +35,7 @@ EOF
 cat > "$module/opensshd.init" <<EOF
 #!/bin/sh
 echo "init \$1" >> "$log"
-[ "\$1" != status ] || exit 0
+[ "\$1" != status ] || exit 1
 EOF
 
 cat > "$bin/private-devpts" <<EOF
@@ -54,6 +54,7 @@ run() {
     SSH_KEYGEN_BIN=$(command -v ssh-keygen) \
     SSH_OPENSSL_BIN=$(command -v openssl) \
     SSH_PRIVATE_DEVPTS=$bin/private-devpts \
+    SSH_PID_FILE=$data/sshd.pid \
     SSH_ROOT_UID=$(id -u) SSH_ROOT_GID=$(id -g) \
     SSH_SHELL_UID=$(id -u) SSH_SHELL_GID=$(id -g) \
     sh "$controller" "$@"
@@ -85,6 +86,23 @@ secondbase=$tmp/second-key
 ssh-keygen -q -t ed25519 -N '' -C tablet -f "$secondbase"
 second=$(cat "$secondbase.pub")
 second_encoded=$(encode "$second")
+
+service_pid=
+state=$(run state)
+printf '%s\n' "$state" | grep -q '^state	stopped$'
+sleep 30 &
+service_pid=$!
+printf '%s\n' "$service_pid" > "$data/sshd.pid"
+state=$(run state)
+printf '%s\n' "$state" | grep -q '^state	running$'
+kill "$service_pid"
+wait "$service_pid" 2>/dev/null || true
+service_pid=
+state=$(run state)
+printf '%s\n' "$state" | grep -q '^state	stopped$'
+printf 'not-a-pid\n' > "$data/sshd.pid"
+state=$(run state)
+printf '%s\n' "$state" | grep -q '^state	stopped$'
 
 expect_fail run keys list nobody
 expect_fail run keys add root "$(encode 'not a public key')"

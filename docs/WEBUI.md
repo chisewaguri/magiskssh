@@ -51,6 +51,11 @@ state\trunning|stopped
 port\tPORT
 ```
 
+The controller reads the configured `PidFile`, which defaults to
+`/data/ssh/sshd.pid`, and confirms that the process still exists with `kill -0`.
+It does not call `opensshd.init status`; the upstream init script has no status
+action.
+
 ### `keys list USER`
 
 Each key produces one record:
