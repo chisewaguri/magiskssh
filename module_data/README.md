@@ -19,6 +19,14 @@ Updates can be installed from within the manager app itself.
 
 ## Configuration
 
+Open the module in KernelSU or APatch to use the WebUI. It can start and stop
+SSH, manage root and shell authorized keys, change common server settings, and
+validate edits to the raw `sshd_config`. Setting changes apply the next time SSH
+starts; the WebUI does not restart it automatically.
+
+Password creation remains terminal-only. The WebUI never receives or stores a
+plaintext password.
+
 SSH keys can be put into `/data/ssh/root/.ssh/authorized_keys` and `/data/ssh/shell/.ssh/authorized_keys` using your favorite method of editing files.
 Note that this file must be owned by the respective user and should have `600` permissions (owner: rw, everyone else: nothing).
 
